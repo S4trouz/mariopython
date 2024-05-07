@@ -42,6 +42,13 @@ coinY= random.randint(0,530)
 def coin():
     screen.blit(coinImg, (coinX,coinY))
 
+score=0
+font = pygame.font.Font(None, 36)
+
+def show_score():
+    score_text = font.render("Score: " + str(score), True, (255, 255, 255))
+    screen.blit(score_text, (10, 10))
+
 #Lancer le jeu
 running=True
 
@@ -75,17 +82,18 @@ while running:
 
     if marioX <=0:
         marioX = 0
-    elif marioX >=750:
-        marioX = 750
+    elif marioX >=730:
+        marioX = 730
     if marioY <=0:
         marioY = 0
-    elif marioY >=550:
-        marioY = 550
+    elif marioY >=530:
+        marioY = 530
     
     #Collision avec la pièce
     if marioX < coinX + 70 and marioX + 70 > coinX and marioY < coinY + 70 and marioY + 70 > coinY:
         coinX = random.randint(0,730)
         coinY = random.randint(0,530)
+        score += 1
 
         goombaX = random.randint(0,730)
         goombaY = random.randint(0,530)
@@ -93,4 +101,5 @@ while running:
     coin()
     mario()
     goomba()
+    show_score()
     pygame.display.update()
