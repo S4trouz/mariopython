@@ -49,8 +49,23 @@ def show_score():
     score_text = font.render("Score: " + str(score), True, (255, 255, 255))
     screen.blit(score_text, (10, 10))
 
+life_icon = pygame.image.load('life_icon.png')
+life_icon = pygame.transform.scale(life_icon, (40, 40))
+num_lives = 3
+
+def show_lives():
+    for i in range(num_lives):
+        screen.blit(life_icon, (750 - (i * 40), 10))
+
+game_over_font = pygame.font.Font(None, 100)
+
+def show_game_over():
+    game_over_text = game_over_font.render("Game Over", True, (255, 255, 255))
+    text_rect = game_over_text.get_rect(center=(400, 300))
+    screen.blit(game_over_text, text_rect)
 #Lancer le jeu
 running=True
+game_over=False
 
 while running:
     screen.fill(color)
@@ -59,7 +74,7 @@ while running:
         if event.type == pygame.QUIT:
             running=False  
 
-    
+    if not game_over:
     #controls
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
@@ -89,6 +104,13 @@ while running:
     elif marioY >=530:
         marioY = 530
     
+    if marioX < goombaX + 70 and marioX + 70 > goombaX and marioY < goombaY + 70 and marioY + 70 > goombaY:
+        goombaX = random.randint(0, 730)
+        goombaY = random.randint(0, 530)
+        num_lives -= 1
+
+        if num_lives == 0:
+            game_over = True
     #Collision avec la pièce
     if marioX < coinX + 70 and marioX + 70 > coinX and marioY < coinY + 70 and marioY + 70 > coinY:
         coinX = random.randint(0,730)
@@ -102,4 +124,9 @@ while running:
     mario()
     goomba()
     show_score()
+    show_lives()
+
+    if game_over:
+        screen.fill((0, 0, 0))
+        show_game_over()
     pygame.display.update()
