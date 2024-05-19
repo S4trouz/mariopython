@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 #initialisation de pygame
 pygame.init()
 
@@ -30,6 +31,11 @@ def mario():
 goombaImg=pygame.image.load('goomba.png')
 goombaImg=pygame.transform.scale(goombaImg,(70,70))
 
+#Déplacement du goomba
+goomba_speed = 0.2
+goombaX_change = goomba_speed
+goombaY_change = goomba_speed
+
 #Affichage du Goomba à une position aléatoire
 def generate_random_goomba_position():
     global goombaX, goombaY
@@ -37,7 +43,7 @@ def generate_random_goomba_position():
         goombaX=random.randint(0, 730)
         goombaY=random.randint(0,530)
 
-        if goombaX != marioX and goombaY != marioY:
+        if math.sqrt((goombaX - marioX) ** 2 + (goombaY - marioY) ** 2) > 150:
             break
 generate_random_goomba_position()
 
@@ -56,7 +62,8 @@ def generate_random_coin_position():
         coinX=random.randint(0, 730)
         coinY=random.randint(0, 530)
 
-        if coinX != marioX and coinY != marioY and coinX != goombaX and coinY != goombaY:
+        if (math.sqrt((coinX - marioX) ** 2 + (coinY - marioY) ** 2) > 150 and
+                math.sqrt((coinX - goombaX) ** 2 + (coinY - goombaY) ** 2) > 150):
             break
 generate_random_coin_position()
 
@@ -136,24 +143,30 @@ while running:
         marioY = 0
     elif marioY >=530:
         marioY = 530
-    
+
+    #Mouvement du goomba quand le score atteint 10
+    if score >= 10:
+        goombaX += goombaX_change
+        goombaY += goombaY_change
+        
+        #Change de direction si le goomba atteint les bords de l'écran
+        if goombaX <= 0 or goombaX >=730:
+            goombaX_change *= -1
+        if goombaY <= 0 or goombaY >=530:
+            goombaY_change *= -1
+
     #Collision avec le Goomba
     if marioX < goombaX + 70 and marioX + 70 > goombaX and marioY < goombaY + 70 and marioY + 70 > goombaY:
-        goombaX = random.randint(0, 730)
-        goombaY = random.randint(0, 530)
-        num_lives -= 1
-
-        if num_lives == 0:
-            game_over = True
+            generate_random_goomba_position()
+            num_lives -= 1
+            if num_lives == 0:
+                game_over = True
 
     #Collision avec la pièce
     if marioX < coinX + 70 and marioX + 70 > coinX and marioY < coinY + 70 and marioY + 70 > coinY:
-        coinX = random.randint(0,730)
-        coinY = random.randint(0,530)
-        score += 1
-
-        goombaX = random.randint(0,730)
-        goombaY = random.randint(0,530)
+            generate_random_coin_position()
+            score += 1
+            generate_random_goomba_position()
     
     #Affichage des élément du jeu
     coin()
