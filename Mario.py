@@ -1,5 +1,6 @@
 import pygame
 import random
+#initialisation de pygame
 pygame.init()
 
 #Générer la fenêtre du jeu 
@@ -13,7 +14,7 @@ color = (58, 157, 35)
 screen.fill(color)
 pygame.display.flip()
 
-#Mario
+#Chargement et redimension de Mario
 marioImg=pygame.image.load('mario.png')
 marioImg=pygame.transform.scale(marioImg,(70,70))
 marioX = 270
@@ -21,48 +22,80 @@ marioY = 380
 marioX_change=0
 marioY_change=0
 
+#Fonction pour afficher Mario
 def mario():
     screen.blit(marioImg, (marioX,marioY))
 
-#Goomba
+#Chargement et redimension du Goomba
 goombaImg=pygame.image.load('goomba.png')
 goombaImg=pygame.transform.scale(goombaImg,(70,70))
-goombaX = random.randint(0, 730)
-goombaY = random.randint(0, 530)
 
+#Affichage du Goomba à une position aléatoire
+def generate_random_goomba_position():
+    global goombaX, goombaY
+    while True:
+        goombaX=random.randint(0, 730)
+        goombaY=random.randint(0,530)
+
+        if goombaX != marioX and goombaY != marioY:
+            break
+generate_random_goomba_position()
+
+#Fonction pour afficher le Goomba sur l'écran 
 def goomba():
     screen.blit(goombaImg, (goombaX,goombaY))
 
-#piece
+#Chargement et redimension de la pièce
 coinImg=pygame.image.load('coin.png')
 coinImg=pygame.transform.scale(coinImg,(70,70))
-coinX = random.randint(0,730)
-coinY= random.randint(0,530)
 
+#Affichage à une position aléatoire de la pièce
+def generate_random_coin_position():
+    global coinX, coinY
+    while True:
+        coinX=random.randint(0, 730)
+        coinY=random.randint(0, 530)
+
+        if coinX != marioX and coinY != marioY and coinX != goombaX and coinY != goombaY:
+            break
+generate_random_coin_position()
+
+#Fonction pour afficher la pièce
 def coin():
     screen.blit(coinImg, (coinX,coinY))
 
+#Score initial
 score=0
+
+#Police d'affichage du score
 font = pygame.font.Font(None, 36)
 
+#Fonction pour afficher le score sur l'écran
 def show_score():
     score_text = font.render("Score: " + str(score), True, (255, 255, 255))
     screen.blit(score_text, (10, 10))
 
+#Chargement et redimension des icônes de vie
 life_icon = pygame.image.load('life_icon.png')
 life_icon = pygame.transform.scale(life_icon, (40, 40))
+
+#Nombre de vie initial
 num_lives = 3
 
+#Fonction pour afficher les vies
 def show_lives():
     for i in range(num_lives):
         screen.blit(life_icon, (750 - (i * 40), 10))
 
+#Police d'affichage du gameover
 game_over_font = pygame.font.Font(None, 100)
 
+#Fonction pour afficher le gameover
 def show_game_over():
     game_over_text = game_over_font.render("Game Over", True, (255, 255, 255))
     text_rect = game_over_text.get_rect(center=(400, 300))
     screen.blit(game_over_text, text_rect)
+
 #Lancer le jeu
 running=True
 game_over=False
@@ -75,7 +108,7 @@ while running:
             running=False  
 
     if not game_over:
-    #controls
+    #Contrôles
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 marioX_change = -1 
@@ -91,10 +124,10 @@ while running:
             elif event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                 marioY_change = 0
 
-
+    #Mouvement de Mario
     marioX += marioX_change
     marioY += marioY_change
-
+    #Limites de l'écran
     if marioX <=0:
         marioX = 0
     elif marioX >=730:
@@ -104,6 +137,7 @@ while running:
     elif marioY >=530:
         marioY = 530
     
+    #Collision avec le Goomba
     if marioX < goombaX + 70 and marioX + 70 > goombaX and marioY < goombaY + 70 and marioY + 70 > goombaY:
         goombaX = random.randint(0, 730)
         goombaY = random.randint(0, 530)
@@ -111,6 +145,7 @@ while running:
 
         if num_lives == 0:
             game_over = True
+
     #Collision avec la pièce
     if marioX < coinX + 70 and marioX + 70 > coinX and marioY < coinY + 70 and marioY + 70 > coinY:
         coinX = random.randint(0,730)
@@ -120,12 +155,14 @@ while running:
         goombaX = random.randint(0,730)
         goombaY = random.randint(0,530)
     
+    #Affichage des élément du jeu
     coin()
     mario()
     goomba()
     show_score()
     show_lives()
 
+    #Affichage du gameover
     if game_over:
         screen.fill((0, 0, 0))
         show_game_over()
