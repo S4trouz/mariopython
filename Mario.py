@@ -36,7 +36,7 @@ goombaImg=pygame.transform.scale(goombaImg,(70,70))
 goomba_speed = 0.2
 goomba_direction = 'horizontal'  # Alternance de 'horizontal' et 'vertical'
 goombaX_change = goomba_speed
-goombaY_change = goomba_speed
+goombaY_change = 0
 
 #Affichage du Goomba à une position aléatoire
 def generate_random_goomba_position():
@@ -184,7 +184,11 @@ while running:
     if marioX < coinX + 70 and marioX + 70 > coinX and marioY < coinY + 70 and marioY + 70 > coinY:
             generate_random_coin_position()
             score += 1
+            # Augmenter la vitesse du gomba chaque fois que le score est un multiple de 10
+            if score % 10 ==0:
+                goomba_speed += 0.1
             generate_random_goomba_position()
+            
     
     #Affichage des élément du jeu
     coin()
