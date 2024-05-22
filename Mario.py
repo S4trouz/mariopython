@@ -6,6 +6,7 @@ pygame.init()
 
 #Générer la fenêtre du jeu 
 pygame.display.set_caption("Mario")
+
 #Background et icon 
 icon=pygame.image.load('mario.png')
 pygame.display.set_icon(icon)
@@ -42,8 +43,9 @@ def generate_random_goomba_position():
 
 #Déplacement du goomba
 goomba_speed = 0.2
+goomba_direction = 'horizontal'  # Alternance de 'horizontal' et 'vertical'
 goombaX_change = goomba_speed
-goombaY_change = goomba_speed
+goombaY_change = 0
 
 #Affichage du Goomba à une position aléatoire
 def generate_random_goomba_position():
@@ -51,7 +53,6 @@ def generate_random_goomba_position():
     while True:
         goombaX=random.randint(0, 730)
         goombaY=random.randint(0,530)
-
         if math.sqrt((goombaX - marioX) ** 2 + (goombaY - marioY) ** 2) > 150:
             break
 generate_random_goomba_position()
@@ -141,6 +142,11 @@ def show_game_over():
 running=True
 game_over=False
 
+
+# Timer pour alterner les direction automatiques
+change_direction_time = 3000  # en millisecondes
+last_direction_change_time = pygame.time.get_ticks()
+
 while running:
     screen.fill(color)
 
@@ -185,6 +191,19 @@ while running:
 
     #Mouvement du goomba quand le score atteint 10
     if score >= 10:
+        current_time = pygame.time.get_ticks()
+        if current_time - last_direction_change_time > change_direction_time:
+            # Alterner la direction du Goomba
+            if goomba_direction == 'horizontal':
+                goomba_direction = 'vertical'
+                goombaX_change = 0
+                goombaY_change = goomba_speed * random.choice([-1, 1])
+            else:
+                goomba_direction = 'horizontal'
+                goombaX_change = goomba_speed * random.choice([-1, 1])
+                goombaY_change = 0
+            last_direction_change_time = current_time
+
         goombaX += goombaX_change
         goombaY += goombaY_change
         
@@ -212,7 +231,11 @@ while running:
     if marioX < coinX + 70 and marioX + 70 > coinX and marioY < coinY + 70 and marioY + 70 > coinY:
             generate_random_coin_position()
             score += 1
+            # Augmenter la vitesse du gomba chaque fois que le score est un multiple de 10
+            if score % 10 ==0:
+                goomba_speed += 0.1
             generate_random_goomba_position()
+            
     
     #Affichage des élément du jeu
     #Affichage des élément du jeu
